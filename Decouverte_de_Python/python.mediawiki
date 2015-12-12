@@ -1,0 +1,64 @@
+== Python ==
+Raspberry PI se programme en Python. Python est un langage de programmation interprété à la fois simple mais aussi extrêmement puissant.<br />
+
+Le système d'exploitation Raspbian (dérivé de Debian) & Occidentalis (Raspbian améliorée à l'AdaFruit) disposent déjà tout deux d'un environnement de programmation Python.
+
+Cependant, pour pouvoir exploiter pleinement le port GPIO de votre Raspberry, vous aurez besoin de de faire quelques mise-à-jours.
+
+La mise-à-jour et l'ajout de nouveaux paquets se fait à l'aide d'un terminal.
+
+=== Ouverture d'un terminal ===
+Un terminal est une session de type texte qui permet d'entrer des commandes au clavier.<br />
+
+Le plus simple pour paramétrer votre raspberry pi est d'ouvrir un terminal à distance avec le logiciel SSH.
+
+SSH est un procédé qui permet de prendre le contrôle d'un Raspberry PI en ligne de commande depuis un autre ordinateur.
+
+cela vous permet de profiter du confort d'un PC pour faire des recherches internet et appliquer les solutions sur votre Raspberry.
+
+Par défaut, SSH est actif sur les OS Raspbian, il suffit de se connecter sur l'adresse IP de votre Raspberry en n'oubliant pas de mentionner l'utilisateur '''pi'''.
+
+Sur votre Raspberry, vous pouvez obtenir l'adresse IP en saississant la commande '''ifconfig'''<br />
+Une adresse IP ressemble à quelque chose comme 192.168.1.17 .<br />
+
+Pour démarrer une session SSH, vous utiliser un logiciel comme Putty sous Windows.<br />
+Si vous utilisez un système Linux (comme Ubuntu), il suffit de saisir la commande suivante (avec la bonne adresse IP).
+ <nowiki>ssh pi@192.168.1.17</nowiki>
+
+=== Mise à jour Raspbian ===
+Avant n'importe quel autre mise-à-jour ou installation de logiciel, '''vous devez toujours vous assurer que votre système d'exploitation est à jour'''
+
+Entrez les commandes suivantes pour mettre votre Raspbian à jour: 
+
+ <nowiki>sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade</nowiki>
+
+=== Mise à jour de Python ===
+Raspberry PI dispose déjà de Python mais pour faire du bricodage électronique, il faut installer quelques paquet et librairies python complémentaires.
+
+ <nowiki>sudo apt-get install python-dev
+sudo apt-get install python-pip </nowiki>
+
+=== Ajout de librairies ===
+Le package python-pip installe un utilitaire nommé PIP, ce dernier permet d'installer des librairie python plus facilement.
+
+A titre d'exemple (et librairie utilisé par un Tutoriel AdaFruit), nous allons installer la librairie '''feedparser''' pour python.
+
+ <nowiki>sudo pip install feedparser</nowiki> 
+
+=== Distribution Python - Mise à jour ===
+Il est aussi nécessaire de faire une mise-à-jour de la distribution python.
+
+ <nowiki>sudo easy_install -U distribute</nowiki>
+
+=== Support GPIO pour Python ===
+Finalement, nous allons ajouter le support GPIO pour python.
+
+Cela nous permettra de commander les broches GPIO depuis des scripts Python :-)
+
+ <nowiki>sudo pip install RPi.GPIO</nowiki>
+Ressource: [http://learn.adafruit.com/raspberry-pi-e-mail-notifier-using-leds/prepare-python Prepare Python] d'AdaFruit.
+
+=== Installation de l'IDE Web Adafruit ===
+https://learn.adafruit.com/webide
