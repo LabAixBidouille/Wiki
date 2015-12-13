@@ -84,16 +84,20 @@ Avant n'importe quel autre mise-à-jour ou installation de logiciel, **vous deve
 
 Entrez les commandes suivantes pour mettre votre Raspbian à jour:
 
-`sudo apt-get update`
-`sudo apt-get upgrade`
-`sudo apt-get dist-upgrade`
+```sh
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+```
 
 #### Mise à jour de Python
 
 Raspberry PI dispose déjà de Python mais pour faire du bricodage électronique, il faut installer quelques paquet et librairies python complémentaires :
 
-`sudo apt-get install python-dev python3-dev`
-`sudo apt-get install python-pip python3-pip`
+```sh
+sudo apt-get install python-dev python3-dev
+sudo apt-get install python-pip python3-pip
+```
 
 #### Ajout des bibliothèques
 
