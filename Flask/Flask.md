@@ -1,4 +1,4 @@
-![vignette|droite](Python-logo.png "vignette|droite")
+![vignette|droite](flask.png "vignette|droite")
 
 Présentation et objectifs
 -------------------------
