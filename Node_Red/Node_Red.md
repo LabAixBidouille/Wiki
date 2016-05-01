@@ -303,4 +303,44 @@ Avec Node-Red, un flot n'est rien d'autre qu'un document *JSON*. Le flot créé 
 ```
 Ce document peut être importé directement dans l'éditeur en copiant/collant le json dans la boîte de dialogue d'importation (Ctrl-I ou via le menu déroulant).
 
+### Troisième étape : LED clignotante
+
+Le premier montage que l'on va effectuer est un grand classique de l'électronique numérique : la LED clignotante.
+
+Évidement utiliser un nano-ordinateur pour juste faire clignoter une LED est largement disproportionné mais cet exemple a de nombreuses qualités pédagogiques. Tout 
+d'abord, il est simple à réaliser et simple à comprendre. Aucune notion complexe d'électronique n'est mise en jeu. Il faut juste comprendre que quand la broche est à l'état haut, la LED sera éclairée et quand la broche est à l'état bas, la LED est éteinte. Le fait d'utiliser un composant lumineux permet de comprendre visuellement ce que fait notre programme ce qui facilite la compréhension pour un débutant. 
+
+#### Rappels: les GPIO
+
+En plus d'être un nano-ordinateur multi-usage et généraliste, le Raspberry Pi dispose d'un ensemble d'éntrées/sorties 
+qui permettent d'interagir avec des montages électroniques. Cet ensemble de 40 broches est appelé GPIO (General Purpose Input / Output) et il 
+est situé sur l'arrête supérieure de la carte (quand les inscriptions sur la cartes sont dans le sens de la lecture). Au fil des version du Raspberry Pi, 
+ce port d'extension a évolué et dans cet atelier, nous considérons que la dernière version présente sur les modèles B+ et 2.
+
+![vignette|droite](gpio-pins-pi2.jpg "vignette|droite")
+
+Ces broches sont une interface physique entre le Pi et le monde extérieur. Au niveau le plus simple, vous pouvez les considérer comme des commutateurs que 
+l'on peut activer ou désactiver (entrée) ou que le Pi peut activer ou désactiver (sortie). Sur les 40 broches, 26 sont des broches GPIO et les autres sont 
+des alimentations (3.3V ou 5V) ou des masses (0V).
+
+![vignette|droite](gpio-numbers-pi2.png "vignette|droite")
+
+Il faut remarquer que la numérotation des broches semble peu naturelle au premier abord. Cela vient du fait que les numéros des broches correspondent au numéro des sorties du microcontrolleur Broadcom au coeur de la carte. Pour un être humain ça ne correspond à rien de parlant et généralement on a pas d'autres choix que de se référer à un guide.
+
+Il existe une autre façon de numéroter les broches, qui est moins utilisée, c'est la numérotation physique. Dans cette numérotation, la broche en bas à gauche est la numéro 1, celle du dessus la numéro 2, etc...
+
+![vignette|droite](physical-pin-numbers.png "vignette|droite")
+
+#### Le montage
+
+Pour commander la LED, on utilisera la broche numéro 26 et la masse située juste à proximité. Pour limiter le courant, on utilise une résistance de 220 Ohms.
+Voici le schéma de principe du montage :
+
+![vignette|droite](Premier_montage_raspberry_schema.png "vignette|droite")
+
+La réalisation de ce schéma sur une breadboard devrait ressembler à cela :
+
+![vignette|droite](Premier_montage_raspberry_bb.png "vignette|droite")
+
+#### Le flot
 
