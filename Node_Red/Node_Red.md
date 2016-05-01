@@ -210,7 +210,7 @@ Pour l'utiliser dans le flot courant, faites glisser ce nœud sur l'espace de tr
 
 Le nœud de débogage affiche dans la barre latérale de débogage les messages reçu à partir de son entrée. Par défaut, il affiche simplement la charge utile du message, mais il est possible d'afficher l'objet du message entier. Il consomme des données provenant d'autres noeuds, il est donc dans la catégorie des sorties.
 
-![](Noeud_Debug.png]
+![](Noeud_Debug.png)
 
 Faites glisser ce nœud sur votre espace de travail pour l'ajouter. Comme pour le précédent, vous pouvez faire apparaître la fenêtre d'information pour avoir accès à la documentation du nœud.
 
@@ -259,8 +259,48 @@ les messages dans la barre latérale seront horodatage plus lisibles.
 
 Avec Node-Red, un flot n'est rien d'autre qu'un document *JSON*. Le flot créé dans cet exemple peut être exporté pour pouvoir être plus facilement partageable : 
 ```javascript
-[{"id":"7bc70730.e857d8","type":"inject","z":"ed61f83c.a99068","name":"Injection","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"x":162,"y":387,"wires":[["583534eb.c00b0c"]]},{"id":"7b9ad8e3.9eb048","type":"debug","z":"ed61f83c.a99068","name":"Debug","active":true,"console":"false","complete":"payload","x":357,"y":385,"wires":[]},{"id":"583534eb.c00b0c","type":"function","z":"ed61f83c.a99068","name":"Function","func":"//Création d'un objet Date à partir de la charge utile \nvar date = new Date(msg.payload);\n//Transformation de la charge utile en une chaîne formatée \nmsg.payload = date.toString();\n// Retourne le message\nreturn msg;","outputs":1,"noerr":0,"x":277,"y":505,"wires":[["7b9ad8e3.9eb048"]]}]
+[
+  {
+    "id":"7bc70730.e857d8",
+    "type":"inject",
+    "z":"ed61f83c.a99068",
+    "name":"Injection",
+    "topic":"",
+    "payload":"",
+    "payloadType":"date",
+    "repeat":"",
+    "crontab":"",
+    "once":false,
+     "x":162,
+     "y":387,
+     "wires":[["583534eb.c00b0c"]]
+  },
+  {
+    "id":"7b9ad8e3.9eb048",
+    "type":"debug",
+    "z":"ed61f83c.a99068",
+    "name":"Debug",
+    "active":true,
+    "console":"false",
+    "complete":"payload",
+    "x":357,
+    "y":385,
+    "wires":[]
+  },
+  {
+    "id":"583534eb.c00b0c",
+    "type":"function",
+    "z":"ed61f83c.a99068",
+    "name":"Function",
+    "func":"//Création d'un objet Date à partir de la charge utile \nvar date = new Date(msg.payload);\n//Transformation de la charge utile en une chaîne formatée \nmsg.payload = date.toString();\n// Retourne le message\nreturn msg;",
+    "outputs":1,
+    "noerr":0,
+    "x":277,
+    "y":505,
+    "wires":[["7b9ad8e3.9eb048"]]
+  }
+]
 ```
-
 Ce document peut être importé directement dans l'éditeur en copiant/collant le json dans la boîte de dialogue d'importation (Ctrl-I ou via le menu déroulant).
+
 
