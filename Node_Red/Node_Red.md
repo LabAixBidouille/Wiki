@@ -186,4 +186,81 @@ node-red-start
 #### Installation manuelle
 Si vous souhaitez utiliser une autre version de `node.js` que celle présente dans les dépôts officiels de Raspbian Jessie, vous devrez installer manuellement Node-Red.
 Cette procédure est bien plus complexe que la précédente et dépasse le cadre de ce tutoriel. La documentation officielle donne [la marche à suivre complète](http://nodered.org/docs/hardware/raspberrypi#manual-install).
- 
+
+
+### Deuxième étape : découverte de Node-Red
+
+Une fois votre instance Node-Red en cours d' exécution, ouvrez un navigateur sur l'adresse suivante : 
+http://{nom de votre Rasperry pi}.local:1880
+
+Si tout se passe bien, vous devriez avoir l'affichage suivant : 
+![](Editeur_Visuel.png)
+
+#### Ajouter un nœud Inject
+
+Le nœud *Inject*, comme son nom l'indique, permet d'injecter des messages dans un flux, soit en cliquant sur le bouton sur le nœud, ou en fixant un intervalle de temps entre deux injections. Ce noeud produit des données, il est donc considéré comme une entrée. Il sera utilisé comme point d'entré d'un flot.
+
+![](Noeud_Inject.png)
+
+Pour l'utiliser dans le flot courant, faites glisser ce nœud sur l'espace de travail à partir de la palette à gauche. Ouvrir la barre latérale (Ctrl-Space, ou via le menu déroulant) et sélectionnez l'onglet Infos. Sélectionnez le nœud Inject nouvellement ajouté pour afficher des informations sur ses propriétés et une description de ce qu'il fait.
+
+![](Ecran_Noeud_Inject.png)
+
+#### Ajouter un nœud Debug
+
+Le nœud de débogage affiche dans la barre latérale de débogage les messages reçu à partir de son entrée. Par défaut, il affiche simplement la charge utile du message, mais il est possible d'afficher l'objet du message entier. Il consomme des données provenant d'autres noeuds, il est donc dans la catégorie des sorties.
+
+![](Noeud_Debug.png]
+
+Faites glisser ce nœud sur votre espace de travail pour l'ajouter. Comme pour le précédent, vous pouvez faire apparaître la fenêtre d'information pour avoir accès à la documentation du nœud.
+
+#### Connecter les deux ensemble
+
+Branchez les noeuds *Inject* et *Debug* ensemble en faisant glisser la souris entre le port de sortie premier et le port d'entrée du second.
+
+![](Ecran_Noeud_Inject_Debug.png)
+
+#### Déployer
+
+À ce stade, les nœuds existent uniquement dans l'éditeur et doivent être déployés sur le serveur. Cliquez simplement sur le bouton *Deploy* pour enregistrer votre flot courant et le lancer sur votre instance Node-Red. 
+
+Sélectionnez l'onglet *Debug* de la barre latérale droite et cliquez sur le bouton Inject. Vous devriez voir les nombres apparaître dans la barre latérale. Par défaut, le nœud *Inject* retourne le nombre de millisecondes depuis le 1er Janvier, 1970 comme charge utile.
+
+![](Ecran_Noeud_Inject_Debug_Actif.png)
+
+#### Ajouter un noeud de fonction
+
+Le nœud de fonction permet de passer chaque message reçu à une fonction JavaScript. Ces nœuds sont extrêmement utiles pour transformer un message reçu et l'injecter dans d'autres noeuds.
+
+![](Noeud_Function.png)
+
+Câblez le nœud de fonction entre les nœuds Inject et Debug. Vous devrez peut-être supprimer le fil existant (sélectionner et appuyez sur Suppr sur le clavier). 
+
+![](Ecran_Noeud_Inject_Debug_Function.png)
+
+Double-cliquez sur le nœud de fonction pour faire apparaître la boîte de dialogue d'édition. 
+
+![](Ecran_Noeud_Inject_Debug_Function_Editeur_Code.png)
+
+Copiez le code de suivi dans le domaine de la fonction:
+```javascript
+//Création d'un objet Date à partir de la charge utile 
+var date = new Date(msg.payload);
+//Transformation de la charge utile en une chaîne formatée 
+msg.payload = date.toString();
+// Retourne le message
+return msg;
+```
+Cliquez sur OK pour fermer la boîte de dialogue d'édition, puis cliquez sur le bouton de déploiement. Maintenant, lorsque vous cliquez sur le bouton *Inject*, 
+les messages dans la barre latérale seront horodatage plus lisibles.
+![](Ecran_Noeud_Inject_Debug_Function_Actif.png)
+
+#### La source
+
+Avec Node-Red, un flot n'est rien d'autre qu'un document *JSON*. Le flot créé dans cet exemple peut être exporté pour pouvoir être plus facilement partageable : 
+```javascript
+[{"id":"7bc70730.e857d8","type":"inject","z":"ed61f83c.a99068","name":"Injection","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"x":162,"y":387,"wires":[["583534eb.c00b0c"]]},{"id":"7b9ad8e3.9eb048","type":"debug","z":"ed61f83c.a99068","name":"Debug","active":true,"console":"false","complete":"payload","x":357,"y":385,"wires":[]},{"id":"583534eb.c00b0c","type":"function","z":"ed61f83c.a99068","name":"Function","func":"//Création d'un objet Date à partir de la charge utile \nvar date = new Date(msg.payload);\n//Transformation de la charge utile en une chaîne formatée \nmsg.payload = date.toString();\n// Retourne le message\nreturn msg;","outputs":1,"noerr":0,"x":277,"y":505,"wires":[["7b9ad8e3.9eb048"]]}]
+```
+
+Ce document peut être importé directement dans l'éditeur en copiant/collant le json dans la boîte de dialogue d'importation (Ctrl-I ou via le menu déroulant).
+
