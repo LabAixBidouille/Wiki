@@ -426,6 +426,33 @@ wpi.digitalWrite(pin, !wpi.digitalRead(pin));
 
 return msg;
 ``` 
+### Quatrième étape :  Bouton poussoir
+Le second montage va être une complexification du montage précédent en rajoutant un bouton poussoir. Un bouton poussoir est un interrupteur normalement ouvert qui n'est activé que quand on reste appuyé dessus. Même si d'un point vu électronique, ça reste un composant très simple, sa mise en oeuvre demande quelques connaissances supplémentaires.
 
+![vignette|droite](Second_montage_raspberry_avec_pull_up_schema.png "vignette|droite")
+
+La réalisation de ce schéma sur une breadboard devrait ressembler à cela :
+
+![vignette|droite](Second_montage_raspberry_avec_pull_up_bb.png "vignette|droite")
+
+Quand on regarde le montage, on remarque qu'un coté de l'interrupteur est relié à la masse et que l'autre est relié à une entrée du Raspberry Pi. Il y a aussi une résistance qui est reliée à VCC. Cette résistance permet de fixer l'état de l'entrée à l'état haut quand le bouton poussoir est non-activé. Quand on presse sur l'interrupteur, l'entrée se retrouve au potentiel de la masse (c'est à dire à l'état bas). Cette résistance qui "tire" l'entrée vers le haut s'appelle une résistance de pull-up.
+
+Comme l'utilisation de ces résistances est extrêmement courant, les microcontroleurs offrent la possibilité d'en utiliser sans rajouter de composants. Ces résistance de pull-up sont actionnables programmatiquement. Le montage est donc simplifié : 
+
+![vignette|droite](Second_montage_raspberry_schema.png "vignette|droite")
+
+La réalisation de ce schéma sur une breadboard devrait ressembler à cela :
+
+![vignette|droite](Second_montage_raspberry_bb.png "vignette|droite")
+
+#### Le flot
+Ici la création du flot sera beaucoup plus simple car c'est le changement d'état du bouton qui va déclencher l'allumage de la LED.
+
+![](Ecran_Flot_LED_Bouton.png)
+
+
+```javascript
+[{"id":"9a22d9e6.a66b58","type":"rpi-gpio in","z":"794df946.4c9b58","name":"Bouton","pin":"7","intype":"down","debounce":"25","read":true,"x":70,"y":74,"wires":[["41eec782.3961b8"]]},{"id":"41eec782.3961b8","type":"rpi-gpio out","z":"794df946.4c9b58","name":"LED","pin":"37","set":true,"level":"0","out":"out","x":305,"y":69,"wires":[]}]
+```
 
 
