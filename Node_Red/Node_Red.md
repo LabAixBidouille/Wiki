@@ -255,6 +255,26 @@ Cliquez sur OK pour fermer la boîte de dialogue d'édition, puis cliquez sur le
 les messages dans la barre latérale seront horodatage plus lisibles.
 ![](Ecran_Noeud_Inject_Debug_Function_Actif.png)
 
+#### Les concepts clefs 
+
+##### Flot
+Un flot Node-Red est un enchaînement de nœuds connectés entre-eux par des fils. Ces nœuds échangent des messages pour communiquer. Sous le capot, un flux est constitué d'une liste d'objets JavaScript qui décrivent les nœuds et leurs configurations, ainsi que la liste des nœuds aval auxquels ils sont connectés, les fils.
+
+
+##### Noeud
+
+Les nœuds sont le bloc de construction primaire des flux Node-Red. Quand un flux est en cours d' exécution, les messages sont générés, consommés et traités par des nœuds. Ils peuvent avoir au plus une entrée, et zéro ou plusieurs sorties. Le rôle d'un nœud est de faire transiter des messages à travers le flot. Par exemple, une entrée produit des messages qui seront injectés à travers un fil au nœud suivant. Un nœud de sortie consomme les messages en entrée et agit sur le monde réelle en fonction de ce qui est reçu. Les nœuds sont constitués de code qui fonctionne dans le service Node-Red (javascript), et un fichier HTML constitué d'une description du nœud.
+
+##### Fils
+Les fils définissent des connexions entre les entrées de nœud et les paramètres de sortie dans un flux. Ils relient les extrémités de sortie à des entrées en aval indiquant que les messages générés par un nœud doivent être traitées par le suivant. Notez qu'il est possible de se connecter plus d'un nœud à une sortie en utilisant plusieurs fils différents. Lorsque plusieurs nœuds sont connectés à une seule sortie, les messages sont envoyés à chaque récepteur à tour de rôle (dans l'ordre où ils ont été connectés). Lorsque plus d'une sortie du nœud est connecté à un point d'entrée, les messages provenant de l'un de ces nœuds seront traitées quand ils arrivent. Il est également possible de relier les nœuds en aval vers l'amont pour former des boucles.
+
+##### Message
+Les messages transmis entre les nœuds Node-Red sont, par convention, les objets JavaScript appelé `msg`. Ils sont constitués d'un ensemble de propriétés. Ces messages contiennent en général une propriété  `msg.payload` qui est la charge utile du message. Les noeuds peuvent joindre d'autres propriétés à un message, qui peut être utilisé pour transporter d'autres informations à travers le flot. Lorsque cela se produit, ces propriétés supplémentaires seront documentées.
+
+Les messages sont la structure de données primaire utilisée dans Node-Red. Ils sont, dans la plupart des cas, les seules données avec lesquels les noeuds travaillent quand ils sont activés. Cela garantit qu'un flux de Node-Red est conceptuellement propre et indépendant. chaque nœud est autonome, travaillant avec des messages d'entrée à la création de messages de sortie. Outre l'utilisation des données de contexte, cela signifie que l'effet du traitement d'un nœud est soit contenue dans ses messages de sortie, ou causé par une logique interne qui change les choses à extérieures (telles que des fichiers, des broches IO sur le Pi ou un fichier Dropbox). Il n'y a pas d'effets secondaires qui pourraient avoir une incidence sur le comportement des autres noeuds.
+
+Ceci est l'un des principaux avantages d'un langage basé sur des flux. Parce que si les nœuds sont autonomes et interagissent avec d'autres nœuds en utilisant uniquement des messages, vous pouvez être sûr qu'ils ont pas d'effets secondaires indésirables et peuvent donc être réutilisés en toute sécurité lorsque vous créez de nouveaux flux. Cette réutilisation «sûr» de code est exactement ce que vous faites à chaque fois que vous glissez et déposez un noeud sur votre espace de travail.
+
 #### La source
 
 Avec Node-Red, un flot n'est rien d'autre qu'un document *JSON*. Le flot créé dans cet exemple peut être exporté pour pouvoir être plus facilement partageable : 
