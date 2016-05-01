@@ -455,4 +455,50 @@ Ici la création du flot sera beaucoup plus simple car c'est le changement d'ét
 [{"id":"9a22d9e6.a66b58","type":"rpi-gpio in","z":"794df946.4c9b58","name":"Bouton","pin":"7","intype":"down","debounce":"25","read":true,"x":70,"y":74,"wires":[["41eec782.3961b8"]]},{"id":"41eec782.3961b8","type":"rpi-gpio out","z":"794df946.4c9b58","name":"LED","pin":"37","set":true,"level":"0","out":"out","x":305,"y":69,"wires":[]}]
 ```
 
+### Cinquième étape : Récupération de données sur le Web
+Cet exemple est un peu plus complexe commence à apporter des données provenant de sources externes pour faire quelque chose d'utile localement.
+
+- Télécharger une page sur un site Web externe
+- Récupérer des informations
+- Les transformer en une forme utilisable
+- Les écrire dans deux formats :  JSON pour une utilisation ultérieure, et un booléen pour changer les choses en dehors.
+
+Dans l'exemple précédent, le nœud *Inject* a été utilisé pour déclencher le flux lorsque le bouton était cliqué. Ici, ce nœud sera configuré pour déclencher le flot à un intervalle régulier. Faites glisser un nœud *Inject* dans l'espace à partir de la palette. Double cliquez sur le nœud pour afficher la boîte de dialogue d'édition. Réglez l'intervalle de répétition de toutes les 5 minutes. Cliquez sur OK pour fermer la boîte de dialogue.
+
+Le nœud `HttpRequest` peut être utilisé pour récupérer une page web en cas de déclenchement. Après l'avoir ajouté un à l'espace de travail, le modifier pour définir l'URL à:
+```
+http://realtimeweb-prod.nationalgrid.com/SystemData.aspx
+```
+
+Ajouter un noeud fonction avec le code suivant : 
+```javascript
+if (~msg.payload.indexOf('<span')) {
+    var dem = msg.payload.split('Demand:')[1].split("MW")[0];
+    var fre = msg.payload.split('Frequency:')[1].split("Hz")[0];
+
+    msg.payload = {};
+    msg.payload.demand = parseInt(dem.split(">")[1].split("<")[0]);
+    msg.payload.frequency = parseFloat(fre.split(">")[1].split("<")[0]);
+
+    msg2 = {};
+    msg2.payload = (msg.payload.frequency >= 50) ? true : false;
+
+    return [msg,msg2];
+}
+return null;
+```
+
+Régler le nombre de sortie à 2.
+
+
+Ajouter deux noeuds de *Debug* et tout cabler comme suit : 
+![](Ecran_Web.png)
+
+Le code source de cet exemple est donné ci-après :
+
+```javascript
+[{"id":"11b032a3.ee4fcd","type":"inject","name":"Tick","topic":"","payload":"","repeat":"","crontab":"*/5 * * * *","once":false,"x":161,"y":828,"z":"6480e14.f9b7f2","wires":[["a2b3542e.5d4ca8"]]},{"id":"a2b3542e.5d4ca8","type":"http request","name":"UK Power","method":"GET","url":"http://realtimeweb-prod.nationalgrid.com/SystemData.aspx","x":301,"y":828,"z":"6480e14.f9b7f2","wires":[["2631e2da.d9ce1e"]]},{"id":"2631e2da.d9ce1e","type":"function","name":"UK Power Demand","func":"// does a simple text extract parse of the http output to provide an\n// object containing the uk power demand, frequency and time\n\nif (~msg.payload.indexOf('<span')) {\n    var dem = msg.payload.split('Demand:')[1].split(\"MW\")[0];\n    var fre = msg.payload.split('Frequency:')[1].split(\"Hz\")[0];\n\n    msg.payload = {};\n    msg.payload.demand = parseInt(dem.split(\">\")[1].split(\"<\")[0]);\n    msg.payload.frequency = parseFloat(fre.split(\">\")[1].split(\"<\")[0]);\n    \n    msg2 = {};\n    msg2.payload = (msg.payload.frequency >= 50) ? true : false;\n\n    return [msg,msg2];\n}\n\nreturn null;","outputs":"2","valid":true,"x":478,"y":828,"z":"6480e14.f9b7f2","wires":[["8e56f4d3.71a908"],["cd84371b.327bc8"]]},{"id":"8e56f4d3.71a908","type":"debug","name":"","active":true,"complete":false,"x":678,"y":798,"z":"6480e14.f9b7f2","wires":[]},{"id":"cd84371b.327bc8","type":"debug","name":"","active":true,"complete":false,"x":679,"y":869,"z":"6480e14.f9b7f2","wires":[]}]
+```
+
+
 
