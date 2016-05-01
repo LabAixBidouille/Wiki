@@ -275,7 +275,7 @@ Les messages sont la structure de données primaire utilisée dans Node-Red. Ils
 
 Ceci est l'un des principaux avantages d'un langage basé sur des flux. Parce que si les nœuds sont autonomes et interagissent avec d'autres nœuds en utilisant uniquement des messages, vous pouvez être sûr qu'ils ont pas d'effets secondaires indésirables et peuvent donc être réutilisés en toute sécurité lorsque vous créez de nouveaux flux. Cette réutilisation «sûr» de code est exactement ce que vous faites à chaque fois que vous glissez et déposez un noeud sur votre espace de travail.
 
-#### La source
+#### Code source
 
 Avec Node-Red, un flot n'est rien d'autre qu'un document *JSON*. Le flot créé dans cet exemple peut être exporté pour pouvoir être plus facilement partageable : 
 ```javascript
@@ -362,5 +362,70 @@ La réalisation de ce schéma sur une breadboard devrait ressembler à cela :
 
 ![vignette|droite](Premier_montage_raspberry_bb.png "vignette|droite")
 
-#### Le flot
+#### Le flot : version sans utilisation du contexte
+Comme toujours en programmation, il existe de nombreuses solutions au même problème. La première solution présentée peut sembler 
+trop compliquée mais elle présente l'avantage de ne pas utiliser d'effet de bord.
+
+Pour la tester, il vous suffit d'importer le code suivant : 
+
+```javascript
+[{"id":"9ebc6de6.9b5a4","type":"inject","z":"5dfbad8e.984564","name":"Top Départ","topic":"","payload":"1","payloadType":"num","repeat":"","crontab":"","once":true,"x":106,"y":50,"wires":[["c9469651.97bdf8"]]},{"id":"50e11ed3.217f4","type":"rpi-gpio out","z":"5dfbad8e.984564","name":"LED","pin":"37","set":true,"level":"0","out":"out","x":484,"y":50,"wires":[]},{"id":"c9469651.97bdf8","type":"function","z":"5dfbad8e.984564","name":"Flip-Flop","func":"if(msg.payload == 0)\n    msg.payload = 1;\nelse\n    msg.payload = 0;\nreturn msg;","outputs":1,"noerr":0,"x":303,"y":50,"wires":[["50e11ed3.217f4","af857b54.d845b8"]]},{"id":"af857b54.d845b8","type":"delay","z":"5dfbad8e.984564","name":"","pauseType":"delay","timeout":"1","timeoutUnits":"seconds","rate":"1","rateUnits":"second","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":false,"x":297,"y":229,"wires":[["c9469651.97bdf8"]]}]
+```
+![](Ecran_Flot_LED_Clignotante.png)
+
+Le noeud *Inject* envoie un message dans le flot lors de son démarrage. La fonction elle reçoit un message avec une charge utile, la transforme en 0 si elle valait 1 ou en 0 sinon. Le message produit est réinjecté dans la fonction avec un délais de 1 seconde. Ainsi toute les seconde la LED change d'état et produit bien le comportement attendu. 
+
+
+#### Le flot : version avec contexte
+La seconde version a un flot plus simple mais la fonction de clignotement utilise une variable globale pour connaitre l'état précédent de la LED.
+
+```javascript
+[{"id":"9ebc6de6.9b5a4","type":"inject","z":"5dfbad8e.984564","name":"Tic-tac","topic":"","payload":"","payloadType":"date","repeat":"1","crontab":"","once":false,"x":98,"y":48,"wires":[["ffa4da53.09e428"]]},{"id":"50e11ed3.217f4","type":"rpi-gpio out","z":"5dfbad8e.984564","name":"LED","pin":"37","set":true,"level":"0","out":"out","x":477,"y":47,"wires":[]},{"id":"ffa4da53.09e428","type":"function","z":"5dfbad8e.984564","name":"Flip-Flop","func":"if(global.led == 0)\n    global.led = 1;\nelse\n    global.led = 0;\nmsg.payload = global.led;\nreturn msg;","outputs":1,"noerr":0,"x":288,"y":48,"wires":[["50e11ed3.217f4"]]}]
+```
+
+![](Ecran_Flot_LED_Clignotante2.png)
+
+Cette fois-ci le noeud *Inject* envoie un message toute les secondes. La fonction utilise une variable globale `global.led` pour connaitre la valeur courante de la LED. Si elle vaut 0, la fonction la transforme en 1 et inversement. La charge utile du message de sortie de la fonction prendra pour valeur cette variable globale.
+
+#### Le flot : version sans contexte et sans boucle
+La problématique de contexte que l'on rencontre sur ce simple exemple vient du fait que l'on est obligé de connaître l'état du système pour choisir l'action à produire.
+
+Pour arriver à lire une sortie, on ne peut pas utiliser les noeuds fournis par défaut pour gérer les GPIO. Il nous faut utiliser la bibliothèque Wiring Pi qu'il faut installer et paramétrer au préalable.
+
+Pour commencer, l'installation se fait avec les commandes suivantes :
+```sh
+cd ~/.node-red
+npm install wiring-pi
+```
+
+Cela n'ajoute pas de nœuds spécifiques au Node-Red. Au lieu de cela le module peut être mis à disposition pour une utilisation dans des noeuds de fonction. Pour ce faire, 
+modifier le fichier `settings.js` pour ajouter le module au contexte global :
+
+```javascript
+functionGlobalContext: {
+    wpi: require('wiring-pi')
+}
+```
+
+Une fois cette modification faite, vous pouvez importer le flot suivant : 
+
+```javascript
+[{"id":"860e0da9.98757","type":"function","name":"Toggle LED on input","func":"\n// select wpi pin 0 = pin 11 on header (for v2)\nvar pin = 0;\n\n// initialise the wpi to use the global context\nvar wpi = context.global.wpi;\n\n// use the default WiringPi pin number scheme...\nwpi.setup();\n\n// initialise the state of the pin if not already set\n// anything in context.  persists from one call to the function to the next\ncontext.state = context.state || wpi.LOW;\n\n// set the mode to output (just in case)\nwpi.pinMode(pin, wpi.modes.OUTPUT);\n\n// toggle the stored state of the pin\n(context.state == wpi.LOW) ? context.state = wpi.HIGH : context.state = wpi.LOW;\n\n// output the state to the pin\nwpi.digitalWrite(pin, context.state);\n\n// we don't \"need\" to return anything here but may help for debug\nreturn msg;","outputs":1,"x":333.16666412353516,"y":79.16666793823242,"wires":[["574f5131.36d0f8"]]},{"id":"14446ead.5aa501","type":"inject","name":"tick","topic":"","payload":"","repeat":"1","once":false,"x":113.16666412353516,"y":59.16666793823242,"wires":[["860e0da9.98757"]]},{"id":"574f5131.36d0f8","type":"debug","name":"","active":true,"x":553.1666641235352,"y":99.16666793823242,"wires":[]}]
+```
+
+En ouvrant le code de la fonction, le code est le suivant :
+```javascript
+
+var pin = 25;
+
+var wpi = context.global.wpi;
+wpi.setup();
+wpi.pinMode(pin, wpi.modes.OUTPUT);
+
+wpi.digitalWrite(pin, !wpi.digitalRead(pin));
+
+return msg;
+``` 
+
+
 
